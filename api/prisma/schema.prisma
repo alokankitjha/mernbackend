@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model user{
+  id  String  @id @default(auto())  @map("_id")  @db.ObjectId
+  email  String @unique
+  username String
+  password  String
+  avatar   String?
+  createdat DateTime @default(now())
+  post Post[]
+  savedpost Savedpost[]
+}
+
+
+model Post{
+  id  String  @id @default(auto())  @map("_id")  @db.ObjectId
+  title  String 
+  price Int?
+  img  String[]
+  address   String?
+  city     String?
+  bedroom  Int?
+  bathroom  Int?
+  latitude  String?
+  longitude  String?
+  type   Type?
+  property  Property?
+  createdat DateTime @default(now())
+  User user @relation(fields: [userid],references: [id])
+  userid String @db.ObjectId
+  postdetail Postdetail?
+  savedpost Savedpost[]
+  
+}
+
+enum Type{
+  buy 
+  rent
+}
+
+enum Property{
+apartment
+house
+condo 
+land
+}
+
+model Postdetail{
+   id  String  @id @default(auto())  @map("_id")  @db.ObjectId
+   desc String
+   pet String?
+   utilties String?
+   income String?
+   size Int?
+   school Int?
+   bus Int?
+   restaurant Int?
+   post Post @relation(fields: [postid], references: [id])
+   postid String @db.ObjectId @unique
+
+}
+
+model Savedpost{
+   id  String  @id @default(auto())  @map("_id")  @db.ObjectId
+   User user @relation(fields: [userid],references: [id])
+    post Post @relation(fields: [postid], references: [id])
+    userid String @db.ObjectId 
+     postid String @db.ObjectId @unique
+
+     @@unique([userid,postid])
+    
+}
